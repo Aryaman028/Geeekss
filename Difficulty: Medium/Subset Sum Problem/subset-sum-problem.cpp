@@ -10,9 +10,11 @@ using namespace std;
 class Solution {
   public:
     bool memo(int n,vector<int>&arr, int target,vector<vector<int>>&dp){
-       if(target==0)return true;
+    //   if(target==0)return true;
        
-       if(n==0)return target == arr[0];
+       if(n==0){
+           return target==0 ||  target == arr[0];
+       }
         
         if(dp[n][target] != -1)return dp[n][target];
         
@@ -27,9 +29,34 @@ class Solution {
     bool isSubsetSum(vector<int>& arr, int target) {
         // code here
         int n = arr.size();
-        vector<vector<int>>dp(n+1,vector<int>(target+1,-1));
         
-        return memo(n-1,arr,target,dp);
+        // vector<vector<int>>dp(n+1,vector<int>(target+1,-1));
+        
+        // return memo(n-1,arr,target,dp);
+        
+        
+        // TABULATION
+        vector<vector<bool>>dp(n,vector<bool>(target+1,false));
+
+        
+        // base case
+        for(int i=0;i<n;i++){
+            dp[i][0]=true;
+        }
+        
+        dp[0][arr[0]] = true;
+        
+        for(int i = 1 ; i < n ; i++){
+            for(int j = 1; j <= target; j++){
+                bool take = false;
+                if(j >= arr[i]) take = dp[i - 1][j - arr[i]];
+                
+                bool nottake = dp[i - 1][j];                
+                
+                dp[i][j] = take || nottake;
+            }
+        }
+        return dp[n-1][target];
     }
 };
 
