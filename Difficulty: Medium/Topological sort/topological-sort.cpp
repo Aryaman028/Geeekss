@@ -8,34 +8,53 @@ using namespace std;
 class Solution {
   public:
     // Function to return list containing vertices in Topological order.
-    void dfs(int node,vector<vector<int>>& adj, vector<bool>&visited, stack<int>&s){
-        visited[node] = true;
-        
-        for(auto ele : adj[node]){
-            if(!visited[ele]){
-                dfs(ele,adj,visited,s);
-            }
-        }
-        s.push(node);
-    }
     vector<int> topologicalSort(vector<vector<int>>& adj) {
-        // Your code here
-        int m = adj.size();
-        vector<bool>visited(m,false);
-        stack<int>s;
-        for(int i = 0; i < m; i++){
-            if(!visited[i]){
-                dfs(i,adj,visited,s);
+        // SOLVING IT USING THE KAHN'S ALGORITHM
+        // For this, we will use a slightly modified version 
+        // of BFS where we will be requiring a queue data structure
+        // an array that will store the indegree of each node. The 
+        // indegree of a node is the number of directed edges incoming 
+        // towards it.
+        
+        int n = adj.size();
+        vector<int>inorder(n,0);
+        
+        //inorder vector
+        for(auto v : adj){
+            for(auto ele : v){
+                inorder[ele]++;
             }
         }
-        vector<int>res;
         
-        while(!s.empty()){
-            res.push_back(s.top());
-            s.pop();
+        queue<int>q;
+        for(int i = 0; i < n; i++){
+            if(inorder[i] == 0)q.push(i);
+        }
+        
+        vector<int>res;
+        while(!q.empty()){
+            int l = q.size();
+            
+            while(l--){
+                
+                int cur = q.front();
+                q.pop();
+                res.push_back(cur);
+        
+                for(auto ele : adj[cur]){
+                    inorder[ele]--;
+                    //whenever the inorder of any node gets zero push it
+                    if(inorder[ele] == 0){
+                        q.push(ele);
+                    }
+                }
+                
+            }
         }
         return res;
         
+
+
     }
 };
 
