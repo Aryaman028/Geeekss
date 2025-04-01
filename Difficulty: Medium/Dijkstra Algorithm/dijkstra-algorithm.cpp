@@ -6,41 +6,94 @@ using namespace std;
 // } Driver Code Ends
 
 // User Function Template
+// class Solution {
+//   public:
+//     // Function to find the shortest distance of all the vertices
+//     // from the source vertex src.
+//     vector<int> dijkstra(vector<vector<pair<int, int>>> &adj, int src) {
+//         // Code here
+//         // priority_queue requires a container (like vector) as the second argument.
+//         // The default container is vector<T>, so you need to specify it explicitly when using greater<T>.
+        
+//         priority_queue<pair<int, int>, vector<pair<int, int>>,greater<pair<int, int>>> pq;
+        
+//         pq.push({0,src});
+        
+//         vector<int>dist(adj.size(), 1e9);
+//         dist[src] = 0;
+        
+//         while(!pq.empty()){
+            
+//             int d = pq.top().first;
+//             int node = pq.top().second;
+//             pq.pop();
+            
+//             for(auto ele: adj[node]){
+//                 int neighbour = ele.first;
+//                 int wt = ele.second;
+                
+//                 //when we are getting a smaller value then only we are pushing
+//                 //to the priority queue
+//                 if(wt + d < dist[neighbour]){
+//                     pq.push({wt + d, neighbour});
+//                     dist[neighbour] = wt + d;
+//                 }
+                
+//             }
+//         }
+//         return dist;
+        
+        
+//     }
+// };
 class Solution {
   public:
-    // Function to find the shortest distance of all the vertices
-    // from the source vertex src.
     vector<int> dijkstra(vector<vector<pair<int, int>>> &adj, int src) {
-        // Code here
-        // priority_queue requires a container (like vector) as the second argument.
-        // The default container is vector<T>, so you need to specify it explicitly when using greater<T>.
+        //USING SET 
         
-        priority_queue<pair<int, int>, vector<pair<int, int>>,greater<pair<int, int>>> pq;
+        //USING SET WE CAN REMOVE THE EXISTING PATH
+        // {4,5} AYA 5TH NODE PE AUR DIST[5] = 10 THEN WE KNOW THAT DIST[5] IS NOT
+        // INIFINITE THUS SOMEONE HAS VISITED THEN IT WILL BE INSIDE THE SET
+        // AND IT IS HAVING DIST GREATER THAN THA {4,5} HENCE WE WILL REMOVE
+        // THE EXISTING {10,5} IN THE SET AND INSERT {4,5} FOR FURTHER PATH
+        // AS THERE WILL BE NO USE OF {10,5}
+        // BUT IN PRIORITY QUEUE WE AGAIN GO TO {10,5} AS WE CANT DELETE IN PQ
         
-        pq.push({0,src});
+        int n = adj.size();
+        set<pair<int,int>>st;
+        // {dist,node}
+        vector<int>dist(n, 1e9);
         
-        vector<int>dist(adj.size(), 1e9);
+        st.insert({0,src});
         dist[src] = 0;
         
-        while(!pq.empty()){
+        while(!st.empty()){
+            auto cur = *(st.begin());
             
-            int d = pq.top().first;
-            int node = pq.top().second;
-            pq.pop();
+            int node = cur.second;
+            int d = cur.first;
             
-            for(auto ele: adj[node]){
-                int neighbour = ele.first;
+            st.erase(cur);
+            
+            for(auto ele : adj[node]){
+                int neigh = ele.first;
                 int wt = ele.second;
                 
-                if(wt + d < dist[neighbour]){
-                    pq.push({wt + d, neighbour});
-                    dist[neighbour] = wt + d;
+                if(wt + d < dist[neigh]){
+                    if(dist[neigh] != 1e9){
+                        st.erase({dist[neigh], neigh});
+                    }
+                    dist[neigh] = wt + d;
+                    st.insert({wt+d, neigh});
                 }
-                
+            }
+        }
+        for(int i = 0 ; i < n; i++){
+            if(dist[i] == 1e9){
+                dist[i] = -1;
             }
         }
         return dist;
-        
         
     }
 };
