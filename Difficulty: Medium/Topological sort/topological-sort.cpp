@@ -7,66 +7,51 @@ using namespace std;
 
 class Solution {
   public:
-    // Function to return list containing vertices in Topological order.
-    vector<int> topologicalSort(vector<vector<int>>& adj) {
-        // SOLVING IT USING THE KAHN'S ALGORITHM
-        // For this, we will use a slightly modified version 
-        // of BFS where we will be requiring a queue data structure
-        // an array that will store the indegree of each node. The 
-        // indegree of a node is the number of directed edges incoming 
-        // towards it.
+    void dfs(int node, vector<vector<int>>&adj, vector<bool>&visited, stack<int>&s){
+        visited[node] =true;
         
-        int n = adj.size();
-        vector<int>inorder(n,0);
-        
-        //inorder vector
-        for(auto v : adj){
-            for(auto ele : v){
-                inorder[ele]++;
+        for(int ele : adj[node]){
+            if(!visited[ele]){
+                dfs(ele, adj, visited, s);
             }
         }
+        s.push(node);
+    }
+  
+    vector<int> topoSort(int V, vector<vector<int>>& edges) {
+        //DFS - using stack to store the elements in it when all the operations
+        // has been done on the node
         
-        queue<int>q;
-        for(int i = 0; i < n; i++){
-            if(inorder[i] == 0)q.push(i);
-        }
+        stack<int>s;
+        vector<vector<int>>adj(V);
         
-        vector<int>res;
-        while(!q.empty()){
-            int l = q.size();
+        for(int i = 0 ; i < edges.size(); i++){
+            int u = edges[i][0];
+            int v = edges[i][1];
             
-            while(l--){
-                
-                int cur = q.front();
-                q.pop();
-                res.push_back(cur);
+            adj[u].push_back(v);
+        }
         
-                for(auto ele : adj[cur]){
-                    inorder[ele]--;
-                    //whenever the inorder of any node gets zero push it
-                    if(inorder[ele] == 0){
-                        q.push(ele);
-                    }
-                }
-                
+        vector<bool>visited(V,false);
+        for(int i = 0 ; i < V; i++){
+            if(!visited[i]){
+                dfs(i, adj, visited, s);
             }
+        }
+        vector<int>res;
+        while(!s.empty()){
+            res.push_back(s.top());
+            s.pop();
         }
         return res;
         
-
-
+        
     }
 };
 
 
 //{ Driver Code Starts.
 
-/*  Function to check if elements returned by user
- *   contains the elements in topological sorted form
- *   V: number of vertices
- *   *res: array containing elements in topological sorted form
- *   adj[]: graph input
- */
 int check(int V, vector<int> &res, vector<vector<int>> adj) {
 
     if (V != res.size())
@@ -89,23 +74,26 @@ int main() {
     int T;
     cin >> T;
     while (T--) {
-        int N, E;
-        cin >> N >> E;
-        int u, v;
+        int V, E;
+        cin >> V >> E;
 
-        vector<vector<int>> adj(N);
+        vector<vector<int>> adj(V);
+        vector<vector<int>> edges;
 
         for (int i = 0; i < E; i++) {
             int u, v;
             cin >> u >> v;
             adj[u].push_back(v);
+            edges.push_back({u, v});
         }
 
         Solution obj;
-        vector<int> res = obj.topologicalSort(adj);
-
-        cout << check(N, res, adj) << endl;
-
+        vector<int> res = obj.topoSort(V, edges);
+        bool ans = check(V, res, adj);
+        if (ans)
+            cout << "true\n";
+        else
+            cout << "false\n";
         cout << "~"
              << "\n";
     }
